@@ -5,11 +5,17 @@
   "scripts": {
     "deploy": "wrangler deploy",
     "dev": "wrangler dev",
-    "start": "wrangler dev"
+    "start": "wrangler dev",
+    "forward": "nix run nixpkgs#cloudflared -- tunnel --url http://localhost:8787"
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20240320.1",
     "typescript": "^5.0.4",
     "wrangler": "^3.0.0"
+  },
+  "dependencies": {
+    "discord-api-types": "^0.37.76",
+    "discord-interactions": "^3.4.0",
+    "dotenv": "^16.4.5"
   }
 }

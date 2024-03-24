@@ -1,32 +1,47 @@
-/**
- * Welcome to Cloudflare Workers! This is your first worker.
- *
- * - Run `npm run dev` in your terminal to start a development server
- * - Open a browser tab at http://localhost:8787/ to see your worker in action
- * - Run `npm run deploy` to publish your worker
- *
- * Learn more at https://developers.cloudflare.com/workers/
- */
+import { InteractionResponseType, verifyKey } from "discord-interactions"
+import * as commands from "./commands"
+import { APIInteraction, InteractionType } from "discord-api-types/v10"
 
 export interface Env {
-	// Example binding to KV. Learn more at https://developers.cloudflare.com/workers/runtime-apis/kv/
-	// MY_KV_NAMESPACE: KVNamespace;
-	//
-	// Example binding to Durable Object. Learn more at https://developers.cloudflare.com/workers/runtime-apis/durable-objects/
-	// MY_DURABLE_OBJECT: DurableObjectNamespace;
-	//
-	// Example binding to R2. Learn more at https://developers.cloudflare.com/workers/runtime-apis/r2/
-	// MY_BUCKET: R2Bucket;
-	//
-	// Example binding to a Service. Learn more at https://developers.cloudflare.com/workers/runtime-apis/service-bindings/
-	// MY_SERVICE: Fetcher;
-	//
-	// Example binding to a Queue. Learn more at https://developers.cloudflare.com/queues/javascript-apis/
-	// MY_QUEUE: Queue;
+	DISCORD_PUBLIC_KEY: string
 }
 
+function json(data: any, init?: ResponseInit): Response {
+	return new Response(JSON.stringify(data), {
+		headers: {
+			"Content-Type": "application/json;charset=utf-8",
+		},
+		...init,
+	})
+}
 export default {
 	async fetch(request: Request, env: Env, ctx: ExecutionContext): Promise<Response> {
-		return new Response('Hello World!');
+		if (request.method !== "POST") return new Response("Method not allowed", { status: 405 })
+
+		const signature = request.headers.get("X-Signature-Ed25519")
+		const timestamp = request.headers.get("X-Signature-Timestamp")
+		if (!signature || !timestamp) return new Response("Missing signature", { status: 400 })
+
+		const requestBody = await request.arrayBuffer()
+		if (!verifyKey(requestBody, signature, timestamp, env.DISCORD_PUBLIC_KEY)) return new Response("Not authorized", { status: 401 })
+
+		const interaction = JSON.parse(new TextDecoder().decode(requestBody)) as APIInteraction
+
+		console.log(interaction)
+
+		// The `PING` message is used during the initial webhook handshake, and is
+		// required to configure the webhook in the developer portal.
+		if (interaction.type === InteractionType.Ping) {
+			return json({
+				type: InteractionResponseType.PONG,
+			})
+		}
+
+		if (interaction.type === InteractionType.ApplicationCommand) {
+			// @ts-ignore
+			return json(commands[interaction.data.name]?.run(interaction))
+		}
+
+		return new Response("Unknown interaction type", { status: 400 })
 	},
-};
+}
