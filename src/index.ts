@@ -1,6 +1,6 @@
-import { InteractionResponseType, verifyKey } from "discord-interactions"
+import { verifyKey } from "discord-interactions"
 import * as commands from "./commands"
-import { APIInteraction, InteractionType } from "discord-api-types/v10"
+import { APIInteraction, InteractionType, InteractionResponseType } from "discord-api-types/v10"
 
 export interface Env {
 	DISCORD_PUBLIC_KEY: string
@@ -33,13 +33,29 @@ export default {
 		// required to configure the webhook in the developer portal.
 		if (interaction.type === InteractionType.Ping) {
 			return json({
-				type: InteractionResponseType.PONG,
+				type: InteractionResponseType.Pong,
 			})
 		}
 
 		if (interaction.type === InteractionType.ApplicationCommand) {
 			// @ts-ignore
-			return json(await commands[interaction.data.name]?.run(interaction))
+			try {
+				return json(await commands[interaction.data.name]?.run(interaction))
+			} catch (e) {
+				console.log("Something went wrong", e)
+				return json({
+					type: InteractionResponseType.ChannelMessageWithSource,
+					data: {
+						embeds: [
+							{
+								title: "An error occurred",
+								description: "```\n" + e + "\n```",
+								color: 0xff0000,
+							},
+						],
+					},
+				})
+			}
 		}
 
 		return new Response("Unknown interaction type", { status: 400 })

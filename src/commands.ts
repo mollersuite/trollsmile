@@ -23,25 +23,15 @@ export const duck: Command = {
 		const url = `https://duckduckgo.com/?q=%5C${encodeURIComponent(
 			interaction.data.options!.find((o) => o.name === "query")!.value as string
 		)}`
-		try {
-			const ddg = await fetch(url)
-			console.log(ddg.headers)
-			const found = (await ddg.text()).match(/https%3A(.*?)'/)?.[1].replace(/&rut=.*/, "")
+		const ddg = await fetch(url)
+		console.log(ddg.headers)
+		const found = (await ddg.text()).match(/https%3A(.*?)'/)?.[1].replace(/&rut=.*/, "")
 
-			return {
-				type: InteractionResponseType.ChannelMessageWithSource,
-				data: {
-					content: found ? "https:" + decodeURIComponent(found) : url,
-				},
-			}
-		} catch (e) {
-			console.log("Something went wrong", e)
-			return {
-				type: InteractionResponseType.ChannelMessageWithSource,
-				data: {
-					content: url,
-				},
-			}
+		return {
+			type: InteractionResponseType.ChannelMessageWithSource,
+			data: {
+				content: found ? "https:" + decodeURIComponent(found) : url,
+			},
 		}
 	},
 	options: [
