@@ -17,8 +17,24 @@ export const wavesmiley: Command = {
 export const duck: Command = {
 	name: "duck",
 	description: "just duck it",
+	name_localizations: {
+		"es-ES": "pato",
+		"es-419": "pato",
+	},
+	description_localizations: {
+		"es-ES": "simplemente pato eso",
+		"es-419": "simplemente pato eso",
+	},
 	integration_types: [IntegrationType.GUILD_INSTALL, IntegrationType.USER_INSTALL],
 	contexts: [IntegrationContext.GUILD, IntegrationContext.BOT_DM, IntegrationContext.PRIVATE_CHANNEL],
+	options: [
+		{
+			name: "query",
+			description: "The query to search for",
+			type: ApplicationCommandOptionType.String,
+			required: true,
+		},
+	],
 	run: async (interaction) => {
 		const url = `https://duckduckgo.com/?q=%5C${encodeURIComponent(
 			interaction.data.options!.find((o) => o.name === "query")!.value as string
@@ -34,14 +50,6 @@ export const duck: Command = {
 			},
 		}
 	},
-	options: [
-		{
-			name: "query",
-			description: "The query to search for",
-			type: ApplicationCommandOptionType.String,
-			required: true,
-		},
-	],
 }
 
 export const Wave: Command = {
