@@ -1,5 +1,5 @@
 import { Command, IntegrationContext, IntegrationType } from "./types"
-import { ApplicationCommandType, InteractionResponseType } from "discord-api-types/v10"
+import { ApplicationCommandOptionType, ApplicationCommandType, InteractionResponseType } from "discord-api-types/v10"
 
 export const wavesmiley: Command = {
 	name: "wavesmiley",
@@ -12,6 +12,33 @@ export const wavesmiley: Command = {
 			content: "https://wavesmiley.com",
 		},
 	}),
+}
+
+export const duck: Command = {
+	name: "duck",
+	description: "just duck it",
+	integration_types: [IntegrationType.GUILD_INSTALL, IntegrationType.USER_INSTALL],
+	contexts: [IntegrationContext.GUILD, IntegrationContext.BOT_DM, IntegrationContext.PRIVATE_CHANNEL],
+	run: async (interaction) => {
+		const url = `https://duck.com/?q=%5C${encodeURIComponent(interaction.data.options!.find((o) => o.name === "query")!.value as string)}`
+		const ddg = await fetch(url).then((res) => res.text())
+		const found = ddg.match(/https%3A(.*?)'/)?.[1]
+
+		return {
+			type: InteractionResponseType.ChannelMessageWithSource,
+			data: {
+				content: found ? "https:" + decodeURIComponent(found) : url,
+			},
+		}
+	},
+	options: [
+		{
+			name: "query",
+			description: "The query to search for",
+			type: ApplicationCommandOptionType.String,
+			required: true,
+		},
+	],
 }
 
 export const Wave: Command = {
