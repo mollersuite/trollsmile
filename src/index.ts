@@ -39,7 +39,7 @@ export default {
 
 		if (interaction.type === InteractionType.ApplicationCommand) {
 			// @ts-ignore
-			return json(commands[interaction.data.name]?.run(interaction))
+			return json(await commands[interaction.data.name]?.run(interaction))
 		}
 
 		return new Response("Unknown interaction type", { status: 400 })
