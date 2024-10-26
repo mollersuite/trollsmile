@@ -40,7 +40,7 @@ export default {
 		if (interaction.type === InteractionType.ApplicationCommand) {
 			// @ts-ignore
 			try {
-				return json(await commands[interaction.data.name]?.run(interaction))
+				return json(await Object.values(commands).find((c) => c.name === interaction.data.name)?.run(interaction))
 			} catch (e) {
 				console.log("Something went wrong", e)
 				return json({
