@@ -7,19 +7,6 @@ import type {
 	APIMessageApplicationCommandInteraction,
 } from "discord-api-types/v10"
 
-export enum CommandOptionType {
-	SUB_COMMAND = 1,
-	SUB_COMMAND_GROUP = 2,
-	STRING = 3,
-	INTEGER = 4, //	Any integer between -2^53 and 2^53
-	BOOLEAN = 5,
-	USER = 6,
-	CHANNEL = 7, //	Includes all channel types + categories
-	ROLE = 8,
-	MENTIONABLE = 9, //	Includes users and roles
-	NUMBER = 10, //	Any double between -2^53 and 2^53
-	ATTACHMENT = 11,
-}
 export enum IntegrationType {
 	GUILD_INSTALL = 0,
 	USER_INSTALL = 1,
@@ -34,6 +21,7 @@ export type Command =
 	| {
 			type?: ApplicationCommandType
 			name: string
+			name_localizations?: Record<string, string>
 			integration_types?: IntegrationType[] // Defaults to [GUILD_INSTALL]
 			contexts?: IntegrationContext[] // Defaults to [GUILD, BOT_DM, PRIVATE_CHANNEL]
 			nsfw?: boolean // Defaults to false
@@ -41,6 +29,7 @@ export type Command =
 	| {
 			type?: ApplicationCommandType.ChatInput
 			description: string
+			description_localizations?: Record<string, string>
 			options?: APIApplicationCommandOption[]
 			run(interaction: APIChatInputApplicationCommandInteraction): Promise<APIInteractionResponse> | APIInteractionResponse
 	  }
