@@ -25,6 +25,22 @@ export const wavesmiley: Command = {
 	},
 }
 
+
+export const badger: Command = {
+	name: "badger",
+	description: "https://github.com/mollersuite/trollsmile/issues/1",
+	integration_types: [IntegrationType.GUILD_INSTALL, IntegrationType.USER_INSTALL],
+	contexts: [IntegrationContext.GUILD, IntegrationContext.BOT_DM, IntegrationContext.PRIVATE_CHANNEL],
+	run: (interaction) => {
+		return {
+			type: InteractionResponseType.ChannelMessageWithSource,
+			data: {
+				content: "https://raw.githubusercontent.com/mollersuite/trollsmile/refs/heads/main/badger.mp4",
+			},
+		}
+	},
+}
+
 export const gayvesmiley: Command = {
 	name: "gayvesmiley",
 	description: "Gay hello.",
