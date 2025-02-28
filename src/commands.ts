@@ -1,5 +1,5 @@
 import { Command, IntegrationContext, IntegrationType } from "./types"
-import { ApplicationCommandOptionType, ApplicationCommandType, InteractionResponseType } from "discord-api-types/v10"
+import { ApplicationCommandOptionType, ApplicationCommandType, InteractionResponseType, MessageFlags } from "discord-api-types/v10"
 
 export const wavesmiley: Command = {
 	name: "wavesmiley",
@@ -24,7 +24,6 @@ export const wavesmiley: Command = {
 		}
 	},
 }
-
 
 export const badger: Command = {
 	name: "badger",
@@ -97,12 +96,22 @@ export const duck: Command = {
 		const ddg = await fetch(url)
 		console.log(ddg.headers)
 		const found = (await ddg.text()).match(/https%3A(.*?)'/)?.[1].replace(/&rut=.*/, "")
-
-		return {
-			type: InteractionResponseType.ChannelMessageWithSource,
-			data: {
-				content: found ? "https:" + decodeURIComponent(found) : url,
-			},
+		const decoded = found && decodeURIComponent(found)
+		if (decoded && !decoded.startsWith("//duckduckgo.com")) {
+			return {
+				type: InteractionResponseType.ChannelMessageWithSource,
+				data: {
+					content: "https:" + decoded,
+				},
+			}
+		} else {
+			return {
+				type: InteractionResponseType.ChannelMessageWithSource,
+				data: {
+					content: "No results returned 💔",
+					flags: MessageFlags.Ephemeral,
+				},
+			}
 		}
 	},
 }
